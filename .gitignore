@@ -1,1 +1,7 @@
 venv/
+
+rzrpy.env
+*.env
+
+__pycache__/
+*.pyc

@@ -22,9 +22,6 @@ class CustomValidator:
         
         if not re.search(r'[0-9]', password):
             errors.append('*Password must contain at least one number')
-        
-        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
-            errors.append('*Password must contain at least one special character')
 
         if errors:
             raise ValidationError(errors)

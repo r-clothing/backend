@@ -27,6 +27,12 @@ class Order(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    razorpay_order_id = models.CharField(max_length=100, blank=True, null=True)
+    razorpay_payment_id = models.CharField(max_length=100, blank=True, null=True)
+    razorpay_signature = models.CharField(max_length=200, blank=True, null=True)
+    
+    is_paid = models.BooleanField(default=False)
+
     def __str__(self):
         return f"Order {self.id} - {self.user.email}"
 

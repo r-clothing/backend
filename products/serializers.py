@@ -35,6 +35,8 @@ class ProductImageModelSerializer(serializers.ModelSerializer):
 class ProductVariantModelSerializer(serializers.ModelSerializer):
     size = SizeOptionSerializer(read_only=True)
 
+    product = serializers.SerializerMethodField()  # ✅ ADD THIS
+
     size_id = serializers.PrimaryKeyRelatedField(
         queryset=SizeOption.objects.all(),
         source='size',
@@ -57,6 +59,7 @@ class ProductVariantModelSerializer(serializers.ModelSerializer):
         model = ProductVariant
         fields = [
             'id',
+            'product',   # ✅ NEW (non-breaking)
             'product_id',
             'size',
             'size_id',
@@ -65,17 +68,14 @@ class ProductVariantModelSerializer(serializers.ModelSerializer):
             'final_price'
         ]
 
-    def validate(self, data):
-        product = data.get('product') or getattr(self.instance, 'product', None)
-        size = data.get('size') or getattr(self.instance, 'size', None)
-
-        if product and size:
-            if size.product_type != product.product_type:
-                raise serializers.ValidationError(
-                    "Size does not match product type"
-                )
-
-        return data
+    def get_product(self, obj):
+        return {
+            "id": obj.product.id,
+            "name": obj.product.name,
+            "main_image": obj.product.images.filter(main=True).first().url
+            if obj.product.images.filter(main=True).exists()
+            else None
+        }
 
 
 class ProductModelSerializer(serializers.ModelSerializer):

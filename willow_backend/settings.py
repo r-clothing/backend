@@ -78,7 +78,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'r_db',
-        'USER': 'hishamali',
+        'USER': 'hisham_ali',
         'PASSWORD': 'hishamali123',
         'HOST': 'localhost',
         'PORT': '5432'
@@ -169,6 +169,14 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 EMAIL_HOST_USER = 'hishamali7848@gmail.com'
-EMAIL_HOST_PASSWORD = 'bdcigzrllcumpcxb'  # your app password
+EMAIL_HOST_PASSWORD = 'bdcigzrllcumpcxb'
 
 DEFAULT_FROM_EMAIL = 'Willow <hishamali7848@gmail.com>'
+
+
+# RAZORPAY
+
+import os
+
+RAZORPAY_KEY_ID = os.getenv('RAZORPAY_KEY_ID')
+RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET')
