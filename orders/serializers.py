@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from .models import Order, OrderItem
 
+from .models import Order, OrderItem
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(
@@ -32,15 +32,15 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
     def get_product_image(self, obj):
         main = obj.variant.product.images.filter(main=True).first()
+
         return main.url if main else None
 
     def get_total_price(self, obj):
-        return obj.price * obj.quantity
 
+        return obj.price * obj.quantity
 
 class OrderSerializer(serializers.ModelSerializer):
     user_email = serializers.CharField(source='user.email', read_only=True)
-
     items = OrderItemSerializer(many=True, read_only=True)
 
     class Meta:
@@ -49,9 +49,16 @@ class OrderSerializer(serializers.ModelSerializer):
             'id',
             'user',
             'user_email',
+            'name',
+            'address',
+            'city',
+            'postal_code',
+            'phone',
             'total_price',
             'status',
+            'is_paid',
             'created_at',
             'items'
         ]
+
         read_only_fields = ['user', 'created_at']

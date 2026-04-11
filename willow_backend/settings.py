@@ -1,4 +1,10 @@
+import os
+
+from datetime import timedelta
+
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -14,9 +20,6 @@ SECRET_KEY = 'django-insecure-2bo^d0-xc29+u6xuzkb5q4+9q%xxo_iqe9g@vx4msp6nm^*ff7
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -71,7 +74,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'willow_backend.wsgi.application'
 
 
-# Database
+# DATABASE
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
@@ -86,7 +89,7 @@ DATABASES = {
 }
 
 
-# Password validation
+# PASSWORD VALIDATION
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -108,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
+# INTERNALIZATION
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
@@ -120,14 +123,13 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
+# STATIC FILES (CSS, JAVASCRIPT, IMAGES)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = '/static/'
 
 
-# DRF CONFIG
-
+# DRF
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication'
@@ -135,15 +137,11 @@ REST_FRAMEWORK = {
 }
 
 
-# ABSTRACTBASEUSER CONFIG
-
+# ABSTRACTBASEUSER MODEL CONFIG.
 AUTH_USER_MODEL = 'accounts.User'
 
 
-# JWT CONFIG
-
-from datetime import timedelta
-
+# JWT
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(minutes=60),
@@ -152,7 +150,6 @@ SIMPLE_JWT = {
 
 
 # BCRYPT
-
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
@@ -162,7 +159,6 @@ PASSWORD_HASHERS = [
 
 
 # EMAIL
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -175,8 +171,8 @@ DEFAULT_FROM_EMAIL = 'Willow <hishamali7848@gmail.com>'
 
 
 # RAZORPAY
-
-import os
+# Explicitly load the rzrpy.env file
+load_dotenv(BASE_DIR / 'rzrpy.env')
 
 RAZORPAY_KEY_ID = os.getenv('RAZORPAY_KEY_ID')
 RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET')

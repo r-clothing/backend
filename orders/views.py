@@ -1,15 +1,15 @@
-from rest_framework.views import APIView
+import razorpay
+
 from rest_framework import generics
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.exceptions import ValidationError
 
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Sum
 from django.db.models.functions import TruncMonth
-
-import razorpay
-from django.conf import settings
 
 from .serializers import OrderSerializer
 from .models import Order, OrderItem
@@ -73,7 +73,11 @@ class CreateOrderView(APIView):
 
             total_price += price * item.quantity
 
-        order.total_price = total_price
+        # Include ₹99 shipping fee to match frontend calculation
+        SHIPPING_FEE = 99
+
+        order.total_price = total_price + SHIPPING_FEE
+
         order.save()
 
         data = {
@@ -85,6 +89,7 @@ class CreateOrderView(APIView):
         try:
             razorpay_order = razorpay_client.order.create(data=data)
             order.razorpay_order_id = razorpay_order['id']
+
             order.save()
 
             cart_items.delete() # Clear cart only if Razorpay order is created
@@ -98,8 +103,13 @@ class CreateOrderView(APIView):
             })
         
         except Exception as e:
+            # Force transaction rollback so order creation & stock deduction are undone
+            transaction.set_rollback(True)
+
             import traceback
-            traceback.print_exc() # This will print the full error in your terminal
+
+            traceback.print_exc()
+
             return Response({"detail": f"Gateway Error: {str(e)}"}, status=500)
         
 class VerifyPaymentView(APIView):
@@ -119,13 +129,20 @@ class VerifyPaymentView(APIView):
             # Verify the signature
             razorpay_client.utility.verify_payment_signature(params_dict)
             
-            # Update your order status
-            order = Order.objects.get(razorpay_order_id=params_dict['razorpay_order_id'])
-            order.status = 'PENDING' # Or a new 'PAID' status if you added one
+            # Update the order status and mark as paid
+            order = Order.objects.get(
+                razorpay_order_id=params_dict['razorpay_order_id'],
+                user=request.user
+            )
+
+            order.is_paid = True
             order.razorpay_payment_id = params_dict['razorpay_payment_id']
+            order.razorpay_signature = params_dict['razorpay_signature']
+
             order.save()
 
             return Response({"detail": "Payment Successful"}, status=200)
+
         except Exception:
             return Response({"detail": "Payment Verification Failed"}, status=400)
 
